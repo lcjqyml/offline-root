@@ -64,4 +64,14 @@ class SparkDemo {
       .sorted.foreach(println) //排序并打印
   }
 
+  @Test
+  def sparkTests3(): Unit = {
+    val conf:SparkConf = new SparkConf().setMaster("local").setAppName("spark-test3") //以本地计算机为spark计算节点
+    val sc:SparkContext = new SparkContext(conf)
+    sc.parallelize(Array("A,B,C","A,C,C","A,C,C","A,B,D","A,D,C","A,D,B")).map(_.split(","))
+      .map(da => ((da(0), da(1)), da(2)))
+      .reduceByKey(_ + _)
+      .toLocalIterator.foreach(println)
+  }
+
 }
