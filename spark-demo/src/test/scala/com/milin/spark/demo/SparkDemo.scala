@@ -33,12 +33,14 @@ class SparkDemo {
     */
   @Test
   def sparkTest1():Unit = {
-    val conf:SparkConf = new SparkConf().setMaster("local").setAppName("spark-test1") //以本地计算机为spark计算节点
+    val conf:SparkConf = new SparkConf()
+      .setMaster("local")
+      .setAppName("spark-test1") //以本地计算机为spark计算节点
     val sc:SparkContext = new SparkContext(conf)
     sc.textFile("/tmp/sparkDemoFile") //加载待计算的本地文件
 //        .repartition(10) //设置可并行分片数，由于数据量较小，且只有本地一个节点，所以不用
         .distinct() //去重
-        .map(_.substring(0, 4)) // 截取前四位
+        .map(_.substring(0, 3)) // 截取前四位
         .map((_, 1)) // 每个值计数1
         .reduceByKey(_ + _) //相同键的计数相加
         .toLocalIterator.toList.sorted //转换为本地List并排序
@@ -50,7 +52,9 @@ class SparkDemo {
     */
   @Test
   def sparkTest2():Unit = {
-    val conf:SparkConf = new SparkConf().setMaster("local").setAppName("spark-test2") //以本地计算机为spark计算节点
+    val conf:SparkConf = new SparkConf()
+      .setMaster("yarn-client")
+      .setAppName("spark-test2") //以本地计算机为spark计算节点
     val sc:SparkContext = new SparkContext(conf)
     val sqlContext:SQLContext = new SQLContext(sc)
     import sqlContext.implicits._ // import spark sql需要用到的隐式转换
@@ -61,7 +65,8 @@ class SparkDemo {
       .rdd // 结果转为rdd
       .map(_.getString(0)) // 从结果中取第一个值
       .take(100) //取结果数据中的一百个到本地
-      .sorted.foreach(println) //排序并打印
+      .sorted
+      .foreach(println) //排序并打印
   }
 
   @Test
